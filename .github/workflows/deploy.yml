@@ -17,6 +17,9 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      IAC_PATH: terraform
+      BACKEND_DIR: backend
 
     steps:
       - name: Configure AWS
@@ -30,10 +33,17 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - uses: actions/checkout@v4
+        with:
+          repository: gal-halevi/cloud-resume-challenge-iac
+          path: ${{env.IAC_PATH}}
+
       - name: Terraform Init
+        working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
         run: terraform init
 
       - name: Deploy
+        working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
         env:
           TF_VAR_table_name:  "visitor_counter"
           TF_VAR_primary_key: "id"
