@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::940482453420:role/oidc_backend_role
