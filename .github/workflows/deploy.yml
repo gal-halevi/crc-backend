@@ -1,0 +1,38 @@
+name: Backend deployment
+on:
+  workflow_dispatch:
+
+jobs:
+        
+  Deply:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::940482453420:role/oidc_backend_role
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - uses: actions/checkout@v4
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Deploy
+        env:
+          TF_VAR_table_name:  "visitor_counter"
+          TF_VAR_primary_key: "id"
+          TF_VAR_source_file_path: lambda_visitor_counter.py
+          TF_VAR_lambda_name: "crc-resume-counter"
+          TF_VAR_lambda_handler_name: "lambda_handler"
+          TV_VAR_api_name: "visitor_counter"
+          TF_VAR_route_key: "POST /visitorCounter"
+          TV_VAR_api_cors_allowed_origins: '["https://mycrc.site", "https://my.mycrc.site", "https://www.mycrc.site"]'
+        run: terraform apply -auto-approve -input=false 
