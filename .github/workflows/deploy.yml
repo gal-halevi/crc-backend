@@ -47,7 +47,7 @@ jobs:
         env:
           TF_VAR_table_name:  "visitor_counter"
           TF_VAR_primary_key: "id"
-          TF_VAR_source_file_path: lambda_visitor_counter.py
+          TF_VAR_source_file_path: "../../lambda_visitor_counter.py"
           TF_VAR_lambda_name: "crc-resume-counter"
           TF_VAR_lambda_handler_name: "lambda_handler"
           TF_VAR_api_name: "visitor_counter"
