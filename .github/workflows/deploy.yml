@@ -1,9 +1,13 @@
 name: Backend deployment
 on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.py'
   workflow_dispatch:
 
 jobs:
-        
   Deply:
     runs-on: ubuntu-latest
     defaults:
