@@ -28,17 +28,30 @@ jobs:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::940482453420:role/oidc_backend_role
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest -v
 
       - name: Checkout IaC code
         uses: actions/checkout@v4
         with:
           repository: gal-halevi/cloud-resume-challenge-iac
           path: ${{env.IAC_PATH}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
         working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
