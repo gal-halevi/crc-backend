@@ -48,6 +48,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: gal-halevi/cloud-resume-challenge-iac
+          ref: test-ci
           path: ${{env.IAC_PATH}}
 
       - name: Setup Terraform
