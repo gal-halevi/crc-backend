@@ -61,6 +61,7 @@ jobs:
       - name: Deploy
         working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
         env:
+          TF_VAR_role_arn: ${{vars.ROLE_TO_ASSUME}}
           TF_VAR_table_name:  "visitor_counter"
           TF_VAR_primary_key: "id"
           TF_VAR_source_file_path: "../../lambda_visitor_counter.py"
