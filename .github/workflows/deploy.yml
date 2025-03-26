@@ -4,12 +4,12 @@ on:
     branches:
       - 'main'
     paths:
-      - '**.py'
+      - 'lambda_visitor_counter.py'
   workflow_dispatch:
 
 permissions:
-  id-token: write # This is required for requesting the JWT for OIDC
-  contents: read  # This is required for actions/checkout
+  id-token: write
+  contents: read
 
 jobs:
   Deply:
@@ -17,30 +17,56 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      IAC_PATH: terraform
+      BACKEND_DIR: backend
 
     steps:
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::940482453420:role/oidc_backend_role
+          role-to-assume: ${{vars.ROLE_TO_ASSUME}}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest -v
+
+      - name: Checkout IaC code
+        uses: actions/checkout@v4
+        with:
+          repository: gal-halevi/cloud-resume-challenge-iac
+          path: ${{env.IAC_PATH}}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - uses: actions/checkout@v4
-
       - name: Terraform Init
+        working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
         run: terraform init
 
       - name: Deploy
+        working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
         env:
+          TF_VAR_role_arn: ${{vars.ROLE_TO_ASSUME}}
           TF_VAR_table_name:  "visitor_counter"
           TF_VAR_primary_key: "id"
-          TF_VAR_source_file_path: lambda_visitor_counter.py
+          TF_VAR_source_file_path: "../../lambda_visitor_counter.py"
           TF_VAR_lambda_name: "crc-resume-counter"
           TF_VAR_lambda_handler_name: "lambda_handler"
-          TV_VAR_api_name: "visitor_counter"
-          TF_VAR_route_key: "POST /visitorCounter"
-          TV_VAR_api_cors_allowed_origins: '["https://mycrc.site", "https://my.mycrc.site", "https://www.mycrc.site"]'
+          TF_VAR_api_name: "visitor_counter"
+          TF_VAR_api_route_key: "POST /visitorCounter"
+          TF_VAR_api_cors_allowed_origins: '["https://mycrc.site", "https://my.mycrc.site", "https://www.mycrc.site"]'
         run: terraform apply -auto-approve -input=false 
