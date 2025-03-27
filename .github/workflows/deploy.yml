@@ -41,8 +41,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
-        run: python -m pytest -v
+      - name: Run unit tests
+        env:
+          TESTS_PATH: tests/unit
+        run: python -m pytest -v "$TESTS_PATH"
 
       - name: Checkout IaC code
         uses: actions/checkout@v4
@@ -69,4 +71,9 @@ jobs:
           TF_VAR_api_name: "visitor_counter"
           TF_VAR_api_route_key: "POST /visitorCounter"
           TF_VAR_api_cors_allowed_origins: '["https://mycrc.site", "https://my.mycrc.site", "https://www.mycrc.site"]'
-        run: terraform apply -auto-approve -input=false 
+        run: terraform apply -auto-approve -input=false
+
+      - name: Run Smoke Tests
+        env:
+          TEST_PATH: tests/smoke
+        run: python -m pytest -v "$TESTS_PATH"
