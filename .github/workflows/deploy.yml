@@ -54,6 +54,9 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          # Causing issues when trying to capture terraform output
+          terraform_wrapper: false
 
       - name: Terraform Init
         working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
