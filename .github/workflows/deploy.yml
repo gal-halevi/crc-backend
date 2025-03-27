@@ -73,7 +73,21 @@ jobs:
           TF_VAR_api_cors_allowed_origins: '["https://mycrc.site", "https://my.mycrc.site", "https://www.mycrc.site"]'
         run: terraform apply -auto-approve -input=false
 
+      - name: Get Terraform Outputs
+        id: tf_output
+        working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
+        run: |
+          api_url=$(terraform output -raw apiUrl)
+          echo "API_URL=$api_url" >> "$GITHUB_OUTPUT"
+          table_name=$(terraform output -raw tableName)
+          echo "TABLE_NAME=$table_name" >> "$GITHUB_OUTPUT"
+          primary_key=$(terraform output -raw primaryKey)
+          echo "PRIMARY_KEY=$primary_key" >> "$GITHUB_OUTPUT"
+    
       - name: Run Smoke Tests
         env:
           TEST_PATH: tests/smoke
+          API_URL: ${{steps.tf_output.outputs.API_URL}}
+          TABLE_NAME: ${{steps.tf_output.outputs.TABLE_NAME}}
+          PRIMARY_KEY: ${{steps.tf_output.outputs.PRIMARY_KEY}}
         run: python -m pytest -v "$TESTS_PATH"
