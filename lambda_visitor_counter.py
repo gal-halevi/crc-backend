@@ -3,6 +3,21 @@ import json
 
 
 def lambda_handler(event, context):
+    """
+    AWS Lambda function to handle visitor counter updates.
+    This function retrieves the table name and primary key from the event input,
+    updates the visitor counter in the specified DynamoDB table, and returns
+    the updated visitor count in the response. If an error occurs, it logs the
+    traceback and returns an error response.
+    Args:
+        event (dict): The event data passed to the Lambda function, typically
+                      containing input parameters such as table name and primary key.
+        context (object): The runtime information provided by AWS Lambda.
+    Returns:
+        dict: A response object containing the HTTP status code and body.
+              On success, the body contains the updated visitor count.
+              On failure, the body contains an error message.
+    """
     try:
         table_name, primary_key = get_inputs(event)
         visitor_counter = get_updated_visitor_counter(table_name, primary_key)
@@ -20,6 +35,24 @@ def get_inputs(event):
 
 
 def get_updated_visitor_counter(table_name, primary_key):
+    """
+    Updates and retrieves the visitor counter from a DynamoDB table.
+
+    This function connects to a DynamoDB table, atomically increments the 
+    `visitorCount` attribute by 1, and returns the updated count. If the 
+    `visitorCount` attribute does not exist, it initializes it to 0 before 
+    incrementing.
+
+    Args:
+        table_name (str): The name of the DynamoDB table.
+        primary_key (str): The name of the primary key attribute in the table.
+
+    Returns:
+        int: The updated visitor count after the increment.
+
+    Raises:
+        botocore.exceptions.ClientError: If there is an error with the DynamoDB operation.
+    """
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
     # Atomically increment visitorCount by 1.
