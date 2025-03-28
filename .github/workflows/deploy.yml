@@ -89,7 +89,7 @@ jobs:
     
       - name: Run Smoke Tests
         env:
-          TEST_PATH: tests/smoke
+          TESTS_PATH: tests/smoke
           API_URL: ${{steps.tf_output.outputs.API_URL}}
           TABLE_NAME: ${{steps.tf_output.outputs.TABLE_NAME}}
           PRIMARY_KEY: ${{steps.tf_output.outputs.PRIMARY_KEY}}
