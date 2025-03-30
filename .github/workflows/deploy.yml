@@ -57,6 +57,7 @@ jobs:
         with:
           repository: gal-halevi/cloud-resume-challenge-iac
           path: ${{env.IAC_PATH}}
+          ref: support-for-multiple-envs
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
