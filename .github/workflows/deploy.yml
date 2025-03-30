@@ -71,7 +71,7 @@ jobs:
       - name: Deploy
         working-directory: ${{env.IAC_PATH}}/${{vars.IAC_ENV_DIR}}
         env:
-          TF_VAR_source_file_path: "../../lambda_visitor_counter.py"
+          TF_VAR_source_file_path: "../../../lambda_visitor_counter.py"
           TF_VAR_env: ${{vars.ENV}}
           TF_VAR_api_cors_allowed_origins: ${{ vars.API_CORS_ALLOWED_ORIGINS }}
         run: terraform apply -auto-approve -input=false
