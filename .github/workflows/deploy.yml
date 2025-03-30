@@ -6,6 +6,11 @@ on:
     paths:
       - 'lambda_visitor_counter.py'
   workflow_dispatch:
+    inputs:
+      env:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'prod'
 
 permissions:
   id-token: write
@@ -14,6 +19,7 @@ permissions:
 jobs:
   Deply:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
     defaults:
       run:
         shell: bash
@@ -65,15 +71,9 @@ jobs:
       - name: Deploy
         working-directory: ${{env.IAC_PATH}}/${{env.BACKEND_DIR}}
         env:
-          TF_VAR_role_arn: ${{vars.ROLE_TO_ASSUME}}
-          TF_VAR_table_name:  "visitor_counter"
-          TF_VAR_primary_key: "id"
           TF_VAR_source_file_path: "../../lambda_visitor_counter.py"
-          TF_VAR_lambda_name: "crc-resume-counter"
-          TF_VAR_lambda_handler_name: "lambda_handler"
-          TF_VAR_api_name: "visitor_counter"
-          TF_VAR_api_route_key: "POST /visitorCounter"
-          TF_VAR_api_cors_allowed_origins: '["https://mycrc.site", "https://my.mycrc.site", "https://www.mycrc.site"]'
+          TF_VAR_env: ${{vars.ENV}}
+          TF_VAR_api_cors_allowed_origins: ${{ vars.API_CORS_ALLOWED_ORIGINS }}
         run: terraform apply -auto-approve -input=false
 
       - name: Get Terraform Outputs
